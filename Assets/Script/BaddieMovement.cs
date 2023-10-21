@@ -16,6 +16,7 @@ public class BaddieMovement : MonoBehaviour
     void Update()
     {
         Vector3 pos = transform.position;
+        Vector3 scale = transform.localScale;
         if (Input.GetKey("w"))
         {
             pos.y += speed * Time.deltaTime;
