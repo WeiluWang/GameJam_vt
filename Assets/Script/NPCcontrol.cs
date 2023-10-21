@@ -19,21 +19,33 @@ public class NPCcontrol : NPC
             Vector3 scale = transform.localScale;
             if (Input.GetKey("w"))
             {
-                pos.y += nobleSpeed * Time.deltaTime;
+                if (pos.y < 9f)
+                {
+                    pos.y += nobleSpeed * Time.deltaTime;
+                }
             }
             else if (Input.GetKey("s"))
             {
-                pos.y -= nobleSpeed * Time.deltaTime;
+                if (pos.y > -9f)
+                {
+                    pos.y -= nobleSpeed * Time.deltaTime;
+                }
             }
             else if (Input.GetKey("a"))
             {
-                transform.localScale = new Vector3(1, 1, 1);
-                pos.x -= nobleSpeed * Time.deltaTime;
+                if (pos.x > -17f)
+                {
+                    transform.localScale = new Vector3(1, 1, 1);
+                    pos.x -= nobleSpeed * Time.deltaTime;
+                }
             }
             else if (Input.GetKey("d"))
             {
-                transform.localScale = new Vector3(-1, 1, 1);
-                pos.x += nobleSpeed * Time.deltaTime;
+                if (pos.x < 17f)
+                {
+                    transform.localScale = new Vector3(-1, 1, 1);
+                    pos.x += nobleSpeed * Time.deltaTime;
+                }
             }
             transform.position = pos;
         }

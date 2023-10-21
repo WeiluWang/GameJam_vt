@@ -346,7 +346,7 @@ Transform:
   m_GameObject: {fileID: 984403649}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 0, z: 1}
+  m_LocalPosition: {x: 10, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -365,6 +365,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78dad22897186ce4293445e02b78447d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SwapRange: 5
+  SwapCoolDown: 10
   state: 0
 --- !u!1 &1021245305
 GameObject:
@@ -440,6 +442,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1aae3acc79fb484399faa11d848590f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SwapRange: 1
+  SwapCoolDown: 10
 --- !u!4 &1045085794
 Transform:
   m_ObjectHideFlags: 0
@@ -642,6 +646,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78dad22897186ce4293445e02b78447d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SwapRange: 1
+  SwapCoolDown: 10
   state: 0
 --- !u!1 &1445334118
 GameObject:
@@ -762,6 +768,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78dad22897186ce4293445e02b78447d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SwapRange: 5
+  SwapCoolDown: 10
   state: 0
 --- !u!1 &1778318077
 GameObject:
@@ -841,8 +849,8 @@ Transform:
   m_GameObject: {fileID: 1778318077}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.3992, y: 0.4611, z: 1}
-  m_LocalScale: {x: 4.9615, y: 4.1577, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 36, y: 20, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -855,6 +863,6 @@ SceneRoots:
   - {fileID: 1021245306}
   - {fileID: 1339041363}
   - {fileID: 984403650}
-  - {fileID: 1778318079}
   - {fileID: 1445334119}
+  - {fileID: 1778318079}
   - {fileID: 1045085794}
