@@ -1,53 +1,125 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
 public class NPCcontrol : NPC
 {
     public NPCstate state;
+    public NPCAction action;
+    public float dyingCountDown = DyingTime;
+    public float scareCountDown = 0;
     void Awake()
     {
         NPCs.Add(this);
+        state = NPCstate.Noble;
     }
 
     void Update()
     {
-        if (NPCs[Baddie] == this)
+        if (state != NPCstate.Dead)
         {
-            Vector3 pos = transform.position;
-            Vector3 scale = transform.localScale;
-            if (Input.GetKey("w"))
+            if (NPCs[Baddie] == this)
             {
+                PlayerControl();
+            }
+            else if (state == NPCstate.Dying)
+            {
+                dyingCountDown -= Time.deltaTime;
+                if (dyingCountDown < 0f)
+                {
+                    die();
+                    //scare(transform.position);
+                }
+            }
+            Movement();
+        }
+    }
+
+    public void die()
+    {
+        if (state != NPCstate.Dead)
+        {
+            state = NPCstate.Dead;
+            transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            if (NPCs[Baddie] != this)
+            {
+                deadCounter++;
+            }
+        }
+    }
+
+
+    public void PlayerControl()
+    {
+        if (Input.GetKey("w"))
+        {
+            action = NPCAction.Up;
+        }
+        else if (Input.GetKey("s"))
+        {
+            action = NPCAction.Down;
+        }
+        else if (Input.GetKey("a"))
+        {
+            action = NPCAction.Left;
+        }
+        else if (Input.GetKey("d"))
+        {
+            action = NPCAction.Right;
+        }
+        else
+        {
+            action = NPCAction.Stop;
+        }
+    }
+
+    public void Movement()
+    {
+        Vector3 pos = transform.position;
+        Vector3 scale = transform.localScale;
+        switch (action) 
+        { 
+            case NPCAction.Up:
                 if (pos.y < 9f)
                 {
                     pos.y += nobleSpeed * Time.deltaTime;
                 }
-            }
-            else if (Input.GetKey("s"))
-            {
+                break; 
+            case NPCAction.Down:
                 if (pos.y > -9f)
                 {
                     pos.y -= nobleSpeed * Time.deltaTime;
                 }
-            }
-            else if (Input.GetKey("a"))
-            {
+                break;
+            case NPCAction.Left:
                 if (pos.x > -17f)
                 {
                     transform.localScale = new Vector3(1, 1, 1);
                     pos.x -= nobleSpeed * Time.deltaTime;
                 }
-            }
-            else if (Input.GetKey("d"))
-            {
+                break; 
+            case NPCAction.Right:
                 if (pos.x < 17f)
                 {
                     transform.localScale = new Vector3(-1, 1, 1);
                     pos.x += nobleSpeed * Time.deltaTime;
                 }
-            }
-            transform.position = pos;
+                break;
+            case NPCAction.Stop:
+                break;
         }
+        transform.position = pos;
     }
+
+    //public void scared(Vector2 sourcePos)
+    //{
+    //    if (state != NPCstate.Dead || state != NPCstate.Dying)
+    //    {
+    //        scareCountDown = ScaredTime;
+    //        Vector2 sourceVector = new Vector2(transform.position.x, transform.position.y) - sourcePos;
+    //        sourceVector = sourceVector.normalized;
+    //    }
+    //}
 }
