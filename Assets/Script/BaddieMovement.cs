@@ -27,10 +27,12 @@ public class BaddieMovement : MonoBehaviour
         }
         else if (Input.GetKey("a"))
         {
+            transform.localScale = new Vector3(1, 1, 1);
             pos.x -= speed * Time.deltaTime;
         }
         else if (Input.GetKey("d"))
         {
+            transform.localScale = new Vector3(-1, 1, 1);
             pos.x += speed * Time.deltaTime;
         }
         transform.position = pos;
