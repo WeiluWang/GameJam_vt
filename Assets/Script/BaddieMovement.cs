@@ -9,6 +9,8 @@ public class BaddieMovement : MonoBehaviour
     [SerializeField] private float speed = 10f;
     [SerializeField] private Animator anim;
     [SerializeField] public bool isMoving;
+    [SerializeField] public bool isShooted = false;
+    //[SerializeField] public bool isScared = false;
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -22,7 +24,8 @@ public class BaddieMovement : MonoBehaviour
         Vector3 scale = transform.localScale;
         if (Input.GetKey("w"))
         {
-            isMoving = true;
+            //isMoving = true;
+            isShooted = true;
             pos.y += speed * Time.deltaTime;
         }
         else if(Input.GetKey("s"))
@@ -50,6 +53,14 @@ public class BaddieMovement : MonoBehaviour
         else 
         {
             anim.SetBool("isMove", true);
+        }
+        if (isShooted == false)
+        {
+            anim.SetBool("isShooted", false);
+        }
+        else {
+            anim.SetBool("isShooted", true);
+            Destroy(gameObject, 1.0f);
         }
         transform.position = pos;
     }
