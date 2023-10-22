@@ -32,8 +32,8 @@ public class NPC : MonoBehaviour
         Right,
         Stop
     }
-    public static float nobleSpeed = 5f;
-    public static float scaredSpeed = 10f;
+    public static float nobleSpeed = 4f;
+    public static float scaredSpeed = 9f;
     public static int deadCounter = 0;
     // Start is called before the first frame update
 
