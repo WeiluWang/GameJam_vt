@@ -8,17 +8,20 @@ public class NPCcontrol : NPC
 {
     public NPCstate state;
     public NPCAction action;
-    public float dyingCountDown = DyingTime;
-    public float scareCountDown = 0;
+    public float dyingCountDown;
+    public float scareCountDown;
     [SerializeField] private Animator anim;
     //[SerializeField] public bool isMoving = false;
-    [SerializeField] public bool isDead = false;
     [SerializeField] public bool isScared = false;
     void Awake()
     {
         NPCs.Add(this);
         state = NPCstate.Noble;
+        action = NPCAction.Stop;
         anim = GetComponent<Animator>();
+        GetComponent<SpriteRenderer>().enabled = true;
+        dyingCountDown = DyingTime;
+        scareCountDown = 0;
     }
 
     void Update()
@@ -32,7 +35,6 @@ public class NPCcontrol : NPC
             else if (state == NPCstate.Dying)
             {
                 dyingCountDown -= Time.deltaTime;
-                isDead = true;
                 
                 if (dyingCountDown < 0f)
                 {
@@ -46,15 +48,12 @@ public class NPCcontrol : NPC
 
     public void die()
     {
-
         if (state != NPCstate.Dead)
         {
-            if (isDead == true)
-            {
-                anim.SetBool("isShooted", true);
-            }
+            anim.SetBool("isShooted", true);
 
-            Debug.Log(isDead);
+            Invoke("hide", 1.6f);
+
             state = NPCstate.Dead;
             
             //transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -63,6 +62,11 @@ public class NPCcontrol : NPC
                 deadCounter++;
             }
         }
+    }
+
+    private void hide()
+    {
+        GetComponent<SpriteRenderer>().enabled = false;
     }
 
 

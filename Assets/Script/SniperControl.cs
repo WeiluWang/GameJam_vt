@@ -7,8 +7,8 @@ public class SniperControl : MonoBehaviour
 {
     [SerializeField] public Camera mainCamera;
     public static bool shootablel;
-    public float reloadTime;
-    private float reloadCountDown;
+    [SerializeField] public float reloadTime;
+    [SerializeField] private float reloadCountDown;
 
     // Start is called before the first frame update
     void Start()

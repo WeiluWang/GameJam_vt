@@ -9,13 +9,13 @@ using Random = UnityEngine.Random;
 public class NPC : MonoBehaviour
 {
     public GameObject textObject;
-    private TMP_Text text;
+    private static TMP_Text text;
     public static int Baddie;
-    public float SwapRange;
-    public float SwapCoolDown;
-    private float SwapCountDown = 0f;
-    public static float DyingTime = 5f;
-    public static float ScaredTime;
+    public static float SwapRange = 1f;
+    public static float SwapCoolDown = 10f;
+    private static float SwapCountDown = 0f;
+    public static float DyingTime = 3f;
+    public static float ScaredTime = 1f;
     public static List<NPCcontrol> NPCs = new List<NPCcontrol>();
     public enum NPCstate
     {
@@ -50,7 +50,13 @@ public class NPC : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Scoring or win text
+        score();
+        swap();
+    }
+
+    // Scoring or win text
+    public void score()
+    {
         if (NPCs[Baddie].state == NPCstate.Dead)
         {
             text.text = "SNIPER WINS";
@@ -67,8 +73,11 @@ public class NPC : MonoBehaviour
             text.text = deadCounter.ToString();
             text.transform.localScale = Vector3.one * 5f + new Vector3(Mathf.Sqrt(deadCounter), Mathf.Sqrt(deadCounter), Mathf.Sqrt(deadCounter)) * 10f;
         }
+    }
 
-        // Swaping
+    // Swaping
+    public void swap()
+    {
         if (SwapCountDown >= 0f)
         {
             SwapCountDown -= Time.deltaTime;
