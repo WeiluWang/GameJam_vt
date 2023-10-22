@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-
+using UnityEngine.UIElements;
 
 public class NPCcontrol : NPC
 {
@@ -13,6 +13,7 @@ public class NPCcontrol : NPC
     [SerializeField] private Animator anim;
     //[SerializeField] public bool isMoving = false;
     [SerializeField] public bool isScared = false;
+    public float BotActionTime = 0;
     void Awake()
     {
         NPCs.Add(this);
@@ -41,6 +42,10 @@ public class NPCcontrol : NPC
                     die();
                     //scare(transform.position);
                 }
+            }
+            else
+            {
+                BotControl();
             }
             Movement();
         }
@@ -100,6 +105,16 @@ public class NPCcontrol : NPC
         
     }
 
+    public void BotControl() 
+    {
+        BotActionTime -= Time.deltaTime;
+        if (BotActionTime <= 0f)
+        {
+            action = GetRandomEnum<NPCAction>();
+            BotActionTime = Random.Range(0.1f, 3f);
+        }
+    }
+
     public void Movement()
     {
         Vector3 pos = transform.position;
@@ -107,35 +122,24 @@ public class NPCcontrol : NPC
         switch (action) 
         { 
             case NPCAction.Up:
-                if (pos.y < 9f)
-                {
-                    pos.y += nobleSpeed * Time.deltaTime;
-                }
+                pos.y += nobleSpeed * Time.deltaTime;
                 break; 
             case NPCAction.Down:
-                if (pos.y > -9f)
-                {
-                    pos.y -= nobleSpeed * Time.deltaTime;
-                }
+                pos.y -= nobleSpeed * Time.deltaTime;
                 break;
             case NPCAction.Left:
-                if (pos.x > -17f)
-                {
-                    transform.localScale = new Vector3(1, 1, 1);
-                    pos.x -= nobleSpeed * Time.deltaTime;
-                }
+                transform.localScale = new Vector3(1, 1, 1);
+                pos.x -= nobleSpeed * Time.deltaTime;
                 break; 
             case NPCAction.Right:
-                if (pos.x < 17f)
-                {
-                    transform.localScale = new Vector3(-1, 1, 1);
-                    pos.x += nobleSpeed * Time.deltaTime;
-                }
+                transform.localScale = new Vector3(-1, 1, 1);
+                pos.x += nobleSpeed * Time.deltaTime;
                 break;
             case NPCAction.Stop:
                 break;
         }
         transform.position = pos;
+        WraparoundCamera.current.WrapMeIfNeeded(GetComponent<SpriteRenderer>());
         if (action == NPCAction.Stop) {
             anim.SetBool("isMove", false);
         }

@@ -106,7 +106,14 @@ public class NPC : MonoBehaviour
             }
         }
     }
-    
+
+    public static T GetRandomEnum<T>()
+    {
+        System.Array A = System.Enum.GetValues(typeof(T));
+        T V = (T)A.GetValue(UnityEngine.Random.Range(0, A.Length));
+        return V;
+    }
+
     //public static void scare(Vector2 pos)
     //{
     //    Collider2D[] targets = Physics2D.OverlapCircleAll(pos, 5f);
