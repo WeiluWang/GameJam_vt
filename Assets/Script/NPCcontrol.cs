@@ -12,7 +12,8 @@ public class NPCcontrol : NPC
     public float scareCountDown = 0;
     [SerializeField] private Animator anim;
     //[SerializeField] public bool isMoving = false;
-    [SerializeField] public bool isShooted = false;
+    [SerializeField] public bool isDead = false;
+    [SerializeField] public bool isScared = false;
     void Awake()
     {
         NPCs.Add(this);
@@ -31,6 +32,13 @@ public class NPCcontrol : NPC
             else if (state == NPCstate.Dying)
             {
                 dyingCountDown -= Time.deltaTime;
+                isDead = true;
+                if (isDead == true) 
+                {
+                    anim.SetBool("isShooted", true);
+                }
+
+                Debug.Log(isDead);
                 if (dyingCountDown < 0f)
                 {
                     die();
@@ -43,9 +51,11 @@ public class NPCcontrol : NPC
 
     public void die()
     {
+
         if (state != NPCstate.Dead)
         {
             state = NPCstate.Dead;
+            
             transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             if (NPCs[Baddie] != this)
             {

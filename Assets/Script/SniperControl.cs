@@ -18,7 +18,7 @@ public class SniperControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Input.mousePosition);
+        //Debug.Log(Input.mousePosition);
         Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPosition.z = 0f;
         transform.position = mouseWorldPosition;
