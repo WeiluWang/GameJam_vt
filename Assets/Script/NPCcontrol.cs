@@ -69,34 +69,59 @@ public class NPCcontrol : NPC
         }
     }
 
+    public void jump() { 
+         if (state != NPCstate.Dead)
+        {
+            anim.SetBool("isJump", true);
+            Invoke("stopJump", 2f);
+        }
+    
+    }
+
     private void hide()
     {
         GetComponent<SpriteRenderer>().enabled = false;
+    }
+    private void stopJump()
+    {
+        anim.SetBool("isJump", false);
     }
 
 
     public void PlayerControl()
     {
-        
+
         if (Input.GetKey("w"))
         {
-            
+
             action = NPCAction.Up;
         }
         else if (Input.GetKey("s"))
         {
-            
+
             action = NPCAction.Down;
         }
         else if (Input.GetKey("a"))
         {
-            
+
             action = NPCAction.Left;
         }
         else if (Input.GetKey("d"))
         {
-            
+
             action = NPCAction.Right;
+        }
+        else if (Input.GetKeyDown("e"))
+        {
+            action = NPCAction.Stop;
+            jump();
+                Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, 5f);
+                foreach (Collider2D target in targets)
+                {
+                    target.GetComponent<NPCcontrol>().jump();
+                }
+            Invoke("stopJump", 2f);
+            
         }
         else
         {
@@ -111,7 +136,7 @@ public class NPCcontrol : NPC
         if (BotActionTime <= 0f)
         {
             action = GetRandomEnum<NPCAction>();
-            BotActionTime = Random.Range(0.1f, 3f);
+            BotActionTime = Random.Range(0.1f, 1.5f);
         }
     }
 
