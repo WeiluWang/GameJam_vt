@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,13 +10,17 @@ using Random = UnityEngine.Random;
 public class NPC : MonoBehaviour
 {
     public GameObject textObject;
+    public GameObject sniper;
     private static TMP_Text text;
+    public GameObject npc;
+    public int npcCount;
     public static int Baddie;
     public static float SwapRange = 1.5f;
     public static float SwapCoolDown = 10f;
     private static float SwapCountDown = 0f;
     public static float DyingTime = 3f;
-    public static float ScaredTime = 1f;
+    public static float ScareRange = 5f;
+    public static float ScaredTime = 1.5f;
     public static List<NPCcontrol> NPCs = new List<NPCcontrol>();
     public enum NPCstate
     {
@@ -33,13 +38,18 @@ public class NPC : MonoBehaviour
         Stop
     }
     public static float nobleSpeed = 4f;
-    public static float scaredSpeed = 9f;
+    public static float scaredSpeed = 6f;
     public static int deadCounter = 0;
+    public static bool BaddieWins = false;
     // Start is called before the first frame update
 
     private void Awake()
     {
         text = textObject.GetComponent<TMP_Text>();
+        for (int i = 0; i < npcCount; i++)
+        {
+            Instantiate(npc);
+        }
     }
 
     void Start()
@@ -57,16 +67,21 @@ public class NPC : MonoBehaviour
     // Scoring or win text
     public void score()
     {
-        if (NPCs[Baddie].state == NPCstate.Dead)
+        if (NPCs[Baddie].state == NPCstate.Dead && !BaddieWins)
         {
             text.text = "SNIPER WINS";
             text.transform.localScale = Vector3.one * 10f;
             text.color = Color.white;
+            sniper.GetComponent<SniperControl>().bulletCount = 99999;
+            sniper.GetComponent<SniperControl>().reloadTime = 0.15f;
         }
-        else if (deadCounter >= 20)
+        else if (deadCounter >= 15 || sniper.GetComponent<SniperControl>().bulletCount <= 0 || BaddieWins)
         {
             text.text = "BADDIE WINS";
             text.transform.localScale = Vector3.one * 10f;
+            sniper.GetComponent<SniperControl>().bulletCount = 99999;
+            sniper.GetComponent<SniperControl>().reloadTime = 0.15f;
+            BaddieWins = true;
         }
         else
         {
@@ -114,12 +129,42 @@ public class NPC : MonoBehaviour
         return V;
     }
 
-    //public static void scare(Vector2 pos)
-    //{
-    //    Collider2D[] targets = Physics2D.OverlapCircleAll(pos, 5f);
-    //    foreach (Collider2D target in targets)
-    //    {
-    //        target.GetComponent<NPCcontrol>().scared(pos);
-    //    }
-    //}
+    public static void scare(Vector2 pos)
+    {
+        Collider2D[] targets = Physics2D.OverlapCircleAll(pos, ScareRange);
+        foreach (Collider2D target in targets)
+        {
+            target.GetComponent<NPCcontrol>().scared(pos);
+        }
+        targets = Physics2D.OverlapCircleAll(new Vector2(pos.x + WraparoundCamera.halfViewWidth * 2, pos.y), ScareRange);
+        foreach (Collider2D target in targets)
+        {
+            target.GetComponent<NPCcontrol>().scared(new Vector2(pos.x + WraparoundCamera.halfViewWidth * 2, pos.y));
+        }
+        targets = Physics2D.OverlapCircleAll(new Vector2(pos.x - WraparoundCamera.halfViewWidth * 2, pos.y), ScareRange);
+        foreach (Collider2D target in targets)
+        {
+            target.GetComponent<NPCcontrol>().scared(new Vector2(pos.x - WraparoundCamera.halfViewWidth * 2, pos.y));
+        }
+        targets = Physics2D.OverlapCircleAll(new Vector2(pos.x, pos.y + WraparoundCamera.halfViewHeight * 2), ScareRange);
+        foreach (Collider2D target in targets)
+        {
+            target.GetComponent<NPCcontrol>().scared(new Vector2(pos.x, pos.y + WraparoundCamera.halfViewHeight * 2));
+        }
+        targets = Physics2D.OverlapCircleAll(new Vector2(pos.x, pos.y - WraparoundCamera.halfViewHeight * 2), ScareRange);
+        foreach (Collider2D target in targets)
+        {
+            target.GetComponent<NPCcontrol>().scared(new Vector2(pos.x, pos.y - WraparoundCamera.halfViewHeight * 2));
+        }
+    }
+
+    public static Collider2D[] WarpedOverlapCircleAll(Vector2 pos, float radius)
+    {
+        Collider2D[] targets = Physics2D.OverlapCircleAll(pos, radius);
+        targets = targets.Concat(Physics2D.OverlapCircleAll(new Vector2(pos.x + WraparoundCamera.halfViewWidth * 2, pos.y), radius)).ToArray();
+        targets = targets.Concat(Physics2D.OverlapCircleAll(new Vector2(pos.x - WraparoundCamera.halfViewWidth * 2, pos.y), radius)).ToArray();
+        targets = targets.Concat(Physics2D.OverlapCircleAll(new Vector2(pos.x, pos.y + WraparoundCamera.halfViewHeight * 2), radius)).ToArray();
+        targets = targets.Concat(Physics2D.OverlapCircleAll(new Vector2(pos.x, pos.y - WraparoundCamera.halfViewHeight * 2), radius)).ToArray();
+        return targets;
+    }
 }

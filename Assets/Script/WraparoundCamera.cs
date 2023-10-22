@@ -9,8 +9,43 @@ public class WraparoundCamera : MonoBehaviour
     public GameObject[] childs;
 
     Camera central;
-    float halfViewWidth;
-    float halfViewHeight;
+    public static float halfViewWidth;
+    public static float halfViewHeight;
+
+    public float shakeDuration = 0.5f;
+    public float shakeIntensity = 0.1f;
+
+    private Vector3 originalCameraPosition;
+    private float currentShakeDuration = 0f;
+
+    private void Start()
+    {
+        originalCameraPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        if (currentShakeDuration > 0)
+        {
+            transform.position = originalCameraPosition + Random.insideUnitSphere * shakeIntensity;
+
+            currentShakeDuration -= Time.deltaTime;
+        }
+        else
+        {
+            currentShakeDuration = 0f;
+            transform.position = originalCameraPosition;
+        }
+    }
+
+    public void StartShake()
+    {
+        if (currentShakeDuration <= 0)
+        {
+            currentShakeDuration = shakeDuration;
+            originalCameraPosition = transform.position;
+        }
+    }
 
     void Awake()
     {

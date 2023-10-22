@@ -1,15 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class SniperControl : MonoBehaviour
 {
+    public GameObject textObject;
+    private TMP_Text bulletText;
+    public AudioSource shootAudio;
+    public AudioSource reloadAudio;
     [SerializeField] public Camera mainCamera;
-    public static bool shootablel;
     [SerializeField] public float reloadTime;
-    [SerializeField] private float reloadCountDown;
+    [SerializeField] public float reloadCountDown;
+    [SerializeField] public float bulletCount;
+    public float shootRadius = 0.5f;
 
+    private void Awake()
+    {
+        bulletText = textObject.GetComponent<TMP_Text>();
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -18,19 +30,41 @@ public class SniperControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bulletText.text = bulletCount.ToString();
+        if (reloadCountDown <= 0f)
+        {
+            bulletText.color = Color.blue;
+        }
+        else
+        {
+            bulletText.color = Color.grey;
+        }
         //Debug.Log(Input.mousePosition);
         Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPosition.z = 0f;
         transform.position = mouseWorldPosition;
+        reloadCountDown -= Time.deltaTime;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0) && reloadCountDown <= 0f && bulletCount >= 1)
         {
-            Collider2D[] targets = Physics2D.OverlapCircleAll(mouseWorldPosition, 0.5f);
+            shootAudio.Play();
+            mainCamera.GetComponent<WraparoundCamera>().StartShake();
+            reloadCountDown = reloadTime;
+            if (reloadTime > 0.5f)
+            {
+                Invoke("Reload", 0.5f);
+            }
+            bulletCount--;
+            Collider2D[] targets = NPC.WarpedOverlapCircleAll(mouseWorldPosition, shootRadius);
             foreach (Collider2D target in targets)
             {
                 target.GetComponent<NPCcontrol>().die();
-                //NPC.scare(mouseWorldPosition);
             }
         }
+    }
+
+    public void Reload()
+    {
+        reloadAudio.Play();
     }
 }

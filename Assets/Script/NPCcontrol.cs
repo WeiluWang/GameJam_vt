@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,6 +9,8 @@ public class NPCcontrol : NPC
 {
     public NPCstate state;
     public NPCAction action;
+    public AudioSource deathAudio;
+    public AudioSource scareAudio;
     public float dyingCountDown;
     public float scareCountDown;
     [SerializeField] private Animator anim;
@@ -36,18 +39,27 @@ public class NPCcontrol : NPC
             else if (state == NPCstate.Dying)
             {
                 dyingCountDown -= Time.deltaTime;
-                
+
                 if (dyingCountDown < 0f)
                 {
                     die();
                     //scare(transform.position);
                 }
             }
-            else
+            else if (state != NPCstate.Scared)
             {
                 BotControl();
             }
             Movement();
+            if (state != NPCstate.Dying && scareCountDown > 0f)
+            {
+                state = NPCstate.Scared;
+                scareCountDown -= Time.deltaTime;
+            }
+            if (state == NPCstate.Scared && scareCountDown <= 0f)
+            {
+                state = NPCstate.Noble;
+            }
         }
     }
 
@@ -56,12 +68,15 @@ public class NPCcontrol : NPC
         if (state != NPCstate.Dead)
         {
             anim.SetBool("isShooted", true);
+            anim.SetBool("isScared", false);
 
             Invoke("hide", 1.6f);
-
+            deathAudio.Play();
             state = NPCstate.Dead;
-            
-            //transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+
+            scare(transform.position);
+
             if (NPCs[Baddie] != this)
             {
                 deadCounter++;
@@ -69,14 +84,15 @@ public class NPCcontrol : NPC
         }
     }
 
-    public void jump() { 
-         if (state == NPCstate.Noble)
+    public void jump()
+    {
+        if (state == NPCstate.Noble)
         {
             action = NPCAction.Stop;
-            BotActionTime = 2f;
+            BotActionTime = 0.1f;
             anim.SetBool("isJump", true);
         }
-    
+
     }
 
     private void hide()
@@ -85,47 +101,34 @@ public class NPCcontrol : NPC
     }
     private void stopJump()
     {
-        BotActionTime = 0f;
         anim.SetBool("isJump", false);
     }
 
 
     public void PlayerControl()
     {
-        if (Input.GetKey("w"))
-        {
-
-            action = NPCAction.Up;
-        }
-        else if (Input.GetKey("s"))
-        {
-
-            action = NPCAction.Down;
-        }
-        else if (Input.GetKey("a"))
-        {
-
-            action = NPCAction.Left;
-        }
-        else if (Input.GetKey("d"))
-        {
-
-            action = NPCAction.Right;
-        }
-        else
+        Vector2 inputVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        if (inputVector == Vector2.zero)
         {
             action = NPCAction.Stop;
         }
-        Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, 5f);
-        if (Input.GetKey("e"))
+        else
+        {
+            action = GetNearestCardinalDirection(inputVector);
+        }
+        Collider2D[] targets = WarpedOverlapCircleAll(transform.position, 5f);
+        if (Input.GetKey("e") && state == NPCstate.Noble)
         {
             jump();
             foreach (Collider2D target in targets)
             {
-                target.GetComponent<NPCcontrol>().jump();
+                if (target.GetComponent<NPCcontrol>().state == NPCstate.Noble)
+                {
+                    target.GetComponent<NPCcontrol>().jump();
+                }
             }
         }
-        else if (Input.GetKeyUp("e"))
+        else
         {
             stopJump();
             foreach (Collider2D target in targets)
@@ -133,10 +136,10 @@ public class NPCcontrol : NPC
                 target.GetComponent<NPCcontrol>().stopJump();
             }
         }
-        
+
     }
 
-    public void BotControl() 
+    public void BotControl()
     {
         BotActionTime -= Time.deltaTime;
         if (BotActionTime <= 0f)
@@ -150,56 +153,89 @@ public class NPCcontrol : NPC
     {
         Vector3 pos = transform.position;
         Vector3 scale = transform.localScale;
-        switch (action) 
-        { 
+        float speed = nobleSpeed;
+        if (state == NPCstate.Scared)
+        {
+            speed = scaredSpeed;
+        }
+        switch (action)
+        {
             case NPCAction.Up:
-                pos.y += nobleSpeed * Time.deltaTime;
-                break; 
+                pos.y += speed * Time.deltaTime;
+                break;
             case NPCAction.Down:
-                pos.y -= nobleSpeed * Time.deltaTime;
+                pos.y -= speed * Time.deltaTime;
                 break;
             case NPCAction.Left:
                 transform.localScale = new Vector3(1, 1, 1);
-                pos.x -= nobleSpeed * Time.deltaTime;
-                break; 
+                pos.x -= speed * Time.deltaTime;
+                break;
             case NPCAction.Right:
                 transform.localScale = new Vector3(-1, 1, 1);
-                pos.x += nobleSpeed * Time.deltaTime;
+                pos.x += speed * Time.deltaTime;
                 break;
             case NPCAction.Stop:
                 break;
         }
         transform.position = pos;
         WraparoundCamera.current.WrapMeIfNeeded(GetComponent<SpriteRenderer>());
-        if (action == NPCAction.Stop) {
+        if (action == NPCAction.Stop)
+        {
             anim.SetBool("isMove", false);
         }
         else
         {
             anim.SetBool("isMove", true);
         }
-
+        if (state == NPCstate.Scared)
+        {
+            anim.SetBool("isScared", true);
+        }
+        else
+        {
+            anim.SetBool("isScared", false);
+        }
     }
 
-    //public void scared(Vector2 sourcePos)
-    //{
-    //    if (state != NPCstate.Dead || state != NPCstate.Dying)
-    //    {
-    //        scareCountDown = ScaredTime;
-    //        Vector2 sourceVector = new Vector2(transform.position.x, transform.position.y) - sourcePos;
-    //        sourceVector = sourceVector.normalized;
 
+    public NPCAction GetNearestCardinalDirection(Vector2 vector)
+    {
+        // Calculate the angles between the input vector and the cardinal direction vectors
+        float angleToUp = Vector2.Angle(vector, Vector2.up);
+        float angleToDown = Vector2.Angle(vector, Vector2.down);
+        float angleToLeft = Vector2.Angle(vector, Vector2.left);
+        float angleToRight = Vector2.Angle(vector, Vector2.right);
 
+        // Find the minimum angle to determine the nearest cardinal direction
+        float minAngle = Mathf.Min(angleToUp, angleToDown, angleToLeft, angleToRight);
 
-            //if (isScared == true)
-            //{
-            //    anim.SetBool("isScared", true);
-            //}
-            //count down 3 seconds
-            //anim.SetBool("isScared", false);
-    //    }
-    //}
+        if (minAngle == angleToUp)
+        {
+            return NPCAction.Up;
+        }
+        else if (minAngle == angleToDown)
+        {
+            return NPCAction.Down;
+        }
+        else if (minAngle == angleToLeft)
+        {
+            return NPCAction.Left;
+        }
+        else
+        {
+            return NPCAction.Right;
+        }
+    }
 
-
-
+    public void scared(Vector2 sourcePos)
+    {
+        if (state != NPCstate.Dead && state != NPCstate.Dying)
+        {
+            scareAudio.Play();
+            stopJump();
+            scareCountDown = ScaredTime;
+            state = NPCstate.Scared;
+            action = GetNearestCardinalDirection(new Vector2(transform.position.x, transform.position.y) - sourcePos);
+        }
+    }
 }
