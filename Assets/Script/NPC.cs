@@ -11,7 +11,7 @@ public class NPC : MonoBehaviour
     public GameObject textObject;
     private static TMP_Text text;
     public static int Baddie;
-    public static float SwapRange = 1f;
+    public static float SwapRange = 1.5f;
     public static float SwapCoolDown = 10f;
     private static float SwapCountDown = 0f;
     public static float DyingTime = 3f;

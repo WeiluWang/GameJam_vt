@@ -70,10 +70,11 @@ public class NPCcontrol : NPC
     }
 
     public void jump() { 
-         if (state != NPCstate.Dead)
+         if (state == NPCstate.Noble)
         {
+            action = NPCAction.Stop;
+            BotActionTime = 2f;
             anim.SetBool("isJump", true);
-            Invoke("stopJump", 2f);
         }
     
     }
@@ -84,13 +85,13 @@ public class NPCcontrol : NPC
     }
     private void stopJump()
     {
+        BotActionTime = 0f;
         anim.SetBool("isJump", false);
     }
 
 
     public void PlayerControl()
     {
-
         if (Input.GetKey("w"))
         {
 
@@ -111,21 +112,26 @@ public class NPCcontrol : NPC
 
             action = NPCAction.Right;
         }
-        else if (Input.GetKeyDown("e"))
-        {
-            action = NPCAction.Stop;
-            jump();
-                Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, 5f);
-                foreach (Collider2D target in targets)
-                {
-                    target.GetComponent<NPCcontrol>().jump();
-                }
-            Invoke("stopJump", 2f);
-            
-        }
         else
         {
             action = NPCAction.Stop;
+        }
+        Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, 5f);
+        if (Input.GetKey("e"))
+        {
+            jump();
+            foreach (Collider2D target in targets)
+            {
+                target.GetComponent<NPCcontrol>().jump();
+            }
+        }
+        else if (Input.GetKeyUp("e"))
+        {
+            stopJump();
+            foreach (Collider2D target in targets)
+            {
+                target.GetComponent<NPCcontrol>().stopJump();
+            }
         }
         
     }
