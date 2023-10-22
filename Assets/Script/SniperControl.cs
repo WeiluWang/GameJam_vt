@@ -25,6 +25,8 @@ public class SniperControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        reloadCountDown = reloadTime;
+        Invoke("Reload", 0.5f);
     }
 
     // Update is called once per frame
