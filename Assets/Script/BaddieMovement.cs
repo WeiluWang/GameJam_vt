@@ -60,7 +60,7 @@ public class BaddieMovement : MonoBehaviour
         }
         else {
             anim.SetBool("isShooted", true);
-            Destroy(gameObject, 1.0f);
+            //Destroy(gameObject, 1.0f);
         }
         transform.position = pos;
     }

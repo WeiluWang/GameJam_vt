@@ -10,10 +10,14 @@ public class NPCcontrol : NPC
     public NPCAction action;
     public float dyingCountDown = DyingTime;
     public float scareCountDown = 0;
+    [SerializeField] private Animator anim;
+    //[SerializeField] public bool isMoving = false;
+    [SerializeField] public bool isShooted = false;
     void Awake()
     {
         NPCs.Add(this);
         state = NPCstate.Noble;
+        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -53,26 +57,32 @@ public class NPCcontrol : NPC
 
     public void PlayerControl()
     {
+        
         if (Input.GetKey("w"))
         {
+            
             action = NPCAction.Up;
         }
         else if (Input.GetKey("s"))
         {
+            
             action = NPCAction.Down;
         }
         else if (Input.GetKey("a"))
         {
+            
             action = NPCAction.Left;
         }
         else if (Input.GetKey("d"))
         {
+            
             action = NPCAction.Right;
         }
         else
         {
             action = NPCAction.Stop;
         }
+        
     }
 
     public void Movement()
@@ -111,6 +121,14 @@ public class NPCcontrol : NPC
                 break;
         }
         transform.position = pos;
+        if (action == NPCAction.Stop) {
+            anim.SetBool("isMove", false);
+        }
+        else
+        {
+            anim.SetBool("isMove", true);
+        }
+        
     }
 
     //public void scared(Vector2 sourcePos)
