@@ -33,12 +33,7 @@ public class NPCcontrol : NPC
             {
                 dyingCountDown -= Time.deltaTime;
                 isDead = true;
-                if (isDead == true) 
-                {
-                    anim.SetBool("isShooted", true);
-                }
-
-                Debug.Log(isDead);
+                
                 if (dyingCountDown < 0f)
                 {
                     die();
@@ -54,9 +49,15 @@ public class NPCcontrol : NPC
 
         if (state != NPCstate.Dead)
         {
+            if (isDead == true)
+            {
+                anim.SetBool("isShooted", true);
+            }
+
+            Debug.Log(isDead);
             state = NPCstate.Dead;
             
-            transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            //transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             if (NPCs[Baddie] != this)
             {
                 deadCounter++;
@@ -138,7 +139,7 @@ public class NPCcontrol : NPC
         {
             anim.SetBool("isMove", true);
         }
-        
+
     }
 
     //public void scared(Vector2 sourcePos)
@@ -148,6 +149,18 @@ public class NPCcontrol : NPC
     //        scareCountDown = ScaredTime;
     //        Vector2 sourceVector = new Vector2(transform.position.x, transform.position.y) - sourcePos;
     //        sourceVector = sourceVector.normalized;
+
+
+
+            //if (isScared == true)
+            //{
+            //    anim.SetBool("isScared", true);
+            //}
+            //count down 3 seconds
+            //anim.SetBool("isScared", false);
     //    }
     //}
+
+
+
 }
