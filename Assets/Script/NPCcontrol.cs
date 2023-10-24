@@ -80,6 +80,10 @@ public class NPCcontrol : NPC
             if (NPCs[Baddie] != this)
             {
                 deadCounter++;
+                if (CountDown > 0)
+                {
+                    CountDown += SwapCoolDown * 1.5f;
+                }
             }
         }
     }

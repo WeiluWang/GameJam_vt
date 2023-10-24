@@ -10,14 +10,18 @@ using Random = UnityEngine.Random;
 public class NPC : MonoBehaviour
 {
     public GameObject textObject;
-    public GameObject sniper;
     private static TMP_Text text;
+    public GameObject CountDownObj;
+    private static TMP_Text CountDownText;
+    public static float CountDown;
+    public GameObject sniper;
     public GameObject npc;
     public int npcCount;
     public static int Baddie;
-    public static float SwapRange = 1.5f;
-    public static float SwapCoolDown = 10f;
-    private static float SwapCountDown = 0f;
+    public float SwapRange = 1.5f;
+    public static float SwapCoolDown = 5f;
+    public int winCount;
+    private float SwapCountDown = 0f;
     public static float DyingTime = 3f;
     public static float ScareRange = 5f;
     public static float ScaredTime = 1.5f;
@@ -46,6 +50,7 @@ public class NPC : MonoBehaviour
     private void Awake()
     {
         text = textObject.GetComponent<TMP_Text>();
+        CountDownText = CountDownObj.GetComponent<TMP_Text>();
         for (int i = 0; i < npcCount; i++)
         {
             Instantiate(npc);
@@ -55,6 +60,7 @@ public class NPC : MonoBehaviour
     void Start()
     {
         Baddie = Random.Range(0, NPCs.Count);
+        CountDown = SwapCoolDown * 4.5f;
     }
 
     // Update is called once per frame
@@ -75,7 +81,7 @@ public class NPC : MonoBehaviour
             sniper.GetComponent<SniperControl>().bulletCount = 99999;
             sniper.GetComponent<SniperControl>().reloadTime = 0.15f;
         }
-        else if (deadCounter >= 15 || sniper.GetComponent<SniperControl>().bulletCount <= 0 || BaddieWins)
+        else if (deadCounter >= winCount || sniper.GetComponent<SniperControl>().bulletCount <= 0 || BaddieWins)
         {
             text.text = "BADDIE WINS";
             text.transform.localScale = Vector3.one * 10f;
@@ -85,6 +91,12 @@ public class NPC : MonoBehaviour
         }
         else
         {
+            CountDownText.text = CountDown.ToString("0.0");
+            CountDown -= Time.deltaTime;
+            if (CountDown <= 0)
+            {
+                NPCs[Baddie].die();
+            }
             text.text = deadCounter.ToString();
             text.transform.localScale = Vector3.one * 5f + new Vector3(Mathf.Sqrt(deadCounter), Mathf.Sqrt(deadCounter), Mathf.Sqrt(deadCounter)) * 10f;
         }
