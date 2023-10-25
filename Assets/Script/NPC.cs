@@ -6,22 +6,24 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
 
 public class NPC : MonoBehaviour
 {
-    public GameObject textObject;
+    [SerializeField] public GameObject textObject;
     private static TMP_Text text;
-    public GameObject CountDownObj;
+    [SerializeField] public GameObject CountDownObj;
     private static TMP_Text CountDownText;
     public static float CountDown;
-    public GameObject sniper;
-    public GameObject npc;
-    public int npcCount;
+    [SerializeField] public GameObject sniper;
+    [SerializeField] public GameObject npc;
+    [SerializeField] public Button _button;
+    [SerializeField] public int npcCount;
     public static int Baddie;
-    public float SwapRange = 1.5f;
+    [SerializeField] public float SwapRange = 1.5f;
     public static float SwapCoolDown = 5f;
-    public int winCount;
-    private float SwapCountDown = 0f;
+    [SerializeField] public int winCount;
+    [SerializeField] private float SwapCountDown = 0f;
     public static float DyingTime = 3f;
     public static float ScareRange = 5f;
     public static float ScaredTime = 1.5f;
@@ -49,6 +51,7 @@ public class NPC : MonoBehaviour
 
     private void Awake()
     {
+        
         text = textObject.GetComponent<TMP_Text>();
         CountDownText = CountDownObj.GetComponent<TMP_Text>();
         for (int i = 0; i < npcCount; i++)
@@ -59,10 +62,21 @@ public class NPC : MonoBehaviour
 
     void Start()
     {
+        _button = GameObject.FindGameObjectWithTag("exitBtn").GetComponent<Button>();
+        //Debug.Log(_button.name+"123");
+        HideButton();
         Baddie = Random.Range(0, NPCs.Count);
         CountDown = SwapCoolDown * 4.5f;
     }
 
+    void HideButton()
+    {
+        _button.gameObject.SetActive(false);
+    }
+    void ShowButton()
+    {
+        _button.gameObject.SetActive(true);
+    }
     // Update is called once per frame
     void Update()
     {
@@ -76,6 +90,7 @@ public class NPC : MonoBehaviour
         if (NPCs[Baddie].state == NPCstate.Dead && !BaddieWins)
         {
             text.text = "SNIPER WINS";
+            ShowButton();
             text.transform.localScale = Vector3.one * 10f;
             text.color = Color.white;
             sniper.GetComponent<SniperControl>().bulletCount = 99999;
@@ -84,6 +99,7 @@ public class NPC : MonoBehaviour
         else if (deadCounter >= winCount || sniper.GetComponent<SniperControl>().bulletCount <= 0 || BaddieWins)
         {
             text.text = "BADDIE WINS";
+            ShowButton();
             text.transform.localScale = Vector3.one * 10f;
             sniper.GetComponent<SniperControl>().bulletCount = 99999;
             sniper.GetComponent<SniperControl>().reloadTime = 0.15f;

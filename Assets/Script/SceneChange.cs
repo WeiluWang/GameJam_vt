@@ -7,4 +7,8 @@ public class SceneChange : MonoBehaviour
     public void PlayGame() {
         SceneManager.LoadSceneAsync("game");
     }
+    public void ExitGame()
+    {
+        SceneManager.LoadSceneAsync("startScene");
+    }
 }
