@@ -17,7 +17,7 @@ public class NPC : MonoBehaviour
     public static float CountDown;
     [SerializeField] public GameObject sniper;
     [SerializeField] public GameObject npc;
-    [SerializeField] public Button _button;
+    [SerializeField] public GameObject _buttonObj;
     [SerializeField] public int npcCount;
     public static int Baddie;
     [SerializeField] public float SwapRange = 1.5f;
@@ -58,24 +58,23 @@ public class NPC : MonoBehaviour
         {
             Instantiate(npc);
         }
+        HideButton();
     }
 
     void Start()
     {
-        _button = GameObject.FindGameObjectWithTag("exitBtn").GetComponent<Button>();
         //Debug.Log(_button.name+"123");
-        HideButton();
         Baddie = Random.Range(0, NPCs.Count);
         CountDown = SwapCoolDown * 4.5f;
     }
 
     void HideButton()
     {
-        _button.gameObject.SetActive(false);
+        _buttonObj.SetActive(false);
     }
     void ShowButton()
     {
-        _button.gameObject.SetActive(true);
+        _buttonObj.SetActive(true);
     }
     // Update is called once per frame
     void Update()

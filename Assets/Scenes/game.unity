@@ -1085,6 +1085,7 @@ MonoBehaviour:
   CountDownObj: {fileID: 1932491477}
   sniper: {fileID: 1021245305}
   npc: {fileID: 3533598860743963797, guid: 1dcd93a27dca91445a91261745e250dc, type: 3}
+  _buttonObj: {fileID: 388890753}
   _button: {fileID: 388890756}
   npcCount: 20
   SwapRange: 1.5
