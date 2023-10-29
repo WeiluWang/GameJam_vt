@@ -27,7 +27,7 @@ public class NPC : MonoBehaviour
     public static float DyingTime = 3f;
     public static float ScareRange = 5f;
     public static float ScaredTime = 1.5f;
-    public static List<NPCcontrol> NPCs = new List<NPCcontrol>();
+    public static List<NPCcontrol> NPCs;
     public enum NPCstate
     {
         Noble,
@@ -54,18 +54,22 @@ public class NPC : MonoBehaviour
         
         text = textObject.GetComponent<TMP_Text>();
         CountDownText = CountDownObj.GetComponent<TMP_Text>();
+        NPCs = new List<NPCcontrol>();
         for (int i = 0; i < npcCount; i++)
         {
             Instantiate(npc);
         }
         HideButton();
+        Baddie = Random.Range(0, NPCs.Count);
+        Debug.Log(Baddie);
+        CountDown = SwapCoolDown * 4.5f;
+        SwapCountDown = SwapCoolDown;
+        deadCounter = 0;
+        BaddieWins = false;
     }
 
     void Start()
     {
-        //Debug.Log(_button.name+"123");
-        Baddie = Random.Range(0, NPCs.Count);
-        CountDown = SwapCoolDown * 4.5f;
     }
 
     void HideButton()
